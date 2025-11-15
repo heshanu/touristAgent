@@ -1,0 +1,21 @@
+# Web framework
+Flask
+
+# MongoDB driver
+pymongo
+
+# LangChain (core version handled automatically)
+langchain
+# langchain-community is optional, can install if needed: pip install langchain-community
+
+# HuggingFace integration
+huggingface_hub
+transformers
+accelerate
+
+# Structured output / schema
+pydantic
+python-dotenv
+
+# Optional: for HTTP requests
+requests
