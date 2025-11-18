@@ -6,10 +6,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Fields and prompts for the travel agent
-FIELDS = ["budget", "comfort_level", "group_size"]
+FIELDS = ["budget", "comfort_level","food_Style","food_type", "group_size"]
 PROMPTS = {
     "budget": "What is your budget for this travel?",
     "comfort_level": "What comfort level do you prefer? (low/medium/high)",
+    "food_Style": "What is your preferred food style? (vegan/vegetarian/non-vegetarian)",
+    "food_type": "What type of food do you prefer? (SriLanka/Indian/Chinese/Italian/Mexican/etc.)",
     "group_size": "How many people are traveling?"
 }
 
@@ -20,11 +22,11 @@ def get_next_question(session: dict) -> str:
         return None
     return PROMPTS[FIELDS[step]]
 
-def send_to_qwen3(travel_data: dict) -> str:
+def send_to_qwen3(food_data: dict) -> str:
     """Send the collected data to Qwen3 and return the response."""
     print("Sending travel data to Qwen3:", travel_data)
     prompt = f"""
-    You are a smart travel assistant. A tourist provided this info: {travel_data}.
+    You are a smart food recommendation assistant. A tourist provided this info: {food_data}.
     Recommend the best mode of travel (bus, taxi, train, rental car, cycling, walking)
     and give reasoning based on distance, budget, comfort, and group size.
     """

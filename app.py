@@ -3,10 +3,10 @@ from flask_cors import CORS
 from db import insert_customer
 from bson import ObjectId
 import uuid
-from agents.registrationAgent import MESSAGE_FIELDS, MESSAGE_PROMPTS, save_message_answer, get_next_message_question
-from agents.travelAgent import get_next_question, agentic_response, TRAVEL_FIELDS
+#from agents.registrationAgent import MESSAGE_FIELDS, MESSAGE_PROMPTS, save_message_answer, get_next_message_question
+from agents.travelAgent import get_next_question, send_to_qwen3
+#from agents.travelAgent import agentic_response
 from dotenv import load_dotenv
-
 load_dotenv()
 
 app = Flask(__name__)
@@ -65,29 +65,42 @@ def message():
 @app.route("/travel-agent", methods=["POST"])
 def travel_agent():
     data = request.json
+    user_id = data.get("user_id")
     text = data.get("text", "").strip()
-    user_id = data.get("user_id", str(uuid.uuid4()))
 
+    # Generate a new user_id if missing
+    if not user_id:
+        user_id = str(uuid.uuid4())
+
+    # Initialize session if new
     if user_id not in sessions:
         sessions[user_id] = {"step": 0, "data": {}}
 
     session = sessions[user_id]
 
-    # Save previous answer
+    # Save the previous answer
     if session["step"] > 0 and text:
-        session["data"][TRAVEL_FIELDS[session["step"] - 1]] = text
+        session["data"][get_field(session["step"] - 1)] = text
 
-    # Ask next question
-    next_q = get_next_question(session)
-    if next_q:
+    # Ask the next question if not finished
+    next_question = get_next_question(session)
+    if next_question:
         session["step"] += 1
-        return jsonify({"message": next_q, "user_id": user_id})
+        return jsonify({"message": next_question, "user_id": user_id})
 
-    # All done → Generate AI reply
-    reply = agentic_response(session)
+    # All fields collected → send to Qwen3-Demo
+    try:
+        reply = send_to_qwen3(session["data"])
+        del sessions[user_id]  # Clear session
+        return jsonify({"message": reply, "user_id": user_id})
+    except Exception as e:
+        del sessions[user_id]  # Clear session
+        return jsonify({"message": f"Error: {str(e)}", "user_id": user_id})
 
-    del sessions[user_id]
-    return jsonify({"message": reply, "user_id": user_id})
+def get_field(step: int) -> str:
+    """Return the field name for a given step."""
+    return ["distance_km", "budget", "comfort_level", "group_size"][step]
+
 
 
 if __name__ == "__main__":
