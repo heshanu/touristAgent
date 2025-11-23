@@ -1,6 +1,6 @@
 # Web framework
 Flask==2.3.2
-
+serverless-wsgi==3.0.0
 # MongoDB driver
 pymongo
 
