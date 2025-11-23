@@ -1,5 +1,5 @@
 # Web framework
-Flask
+Flask==2.3.2
 
 # MongoDB driver
 pymongo
