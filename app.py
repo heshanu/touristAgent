@@ -25,6 +25,9 @@ def convert_objectid(doc):
         return str(doc)
     return doc
         
+@app.route("/")
+def home():
+    return jsonify({"message": "Hello from Flask on Vercel!"})
 
 # --------------------------------------------------
 # 1️⃣ USER INFO MESSAGE BOT

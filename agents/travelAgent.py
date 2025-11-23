@@ -33,7 +33,7 @@ def send_to_qwen3(travel_data: dict) -> str:
         api_key=os.getenv("HF_TOKEN"),
     )
     completion = client.chat.completions.create(
-        model="Qwen/Qwen3-VL-235B-A22B-Thinking",
+        model="CohereLabs/c4ai-command-a-03-2025:cohere",
         messages=[
             {
                 "role": "user",
